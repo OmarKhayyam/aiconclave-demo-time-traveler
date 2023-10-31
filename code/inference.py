@@ -45,20 +45,27 @@ def model_fn(model_dir):
     net.eval()
     net.cuda()
     return net
-#### Lets comment each of the custom implimentations - one at a time ####
-#def input_fn(request_body, request_content_type):
-#    '''WIP: Expecting image/jpeg content type'''
-#    if request_content_type != 'image/jpeg':
-#            raise Exception(f'Requested unsupported ContentType in request content_type {request_content_type}')
-#    print('Deserializing input data')
-#    ## Size of the image is predecided, comes sized from the client.
-#    orig_img = Image.open(BytesIO(base64.b64decode(request_body))).convert("RGB")
-#    orig_img.save('input_image.jpg')
-#    aligned_image = run_alignment('input_image.jpg')
-#    aligned_image.resize((256,256))
-#    final_input_image = trsfms(aligned_image)
-#    return final_input_image
 
+
+def input_fn(request_body, request_content_type):
+    '''WIP: Expecting image/jpeg content type'''
+    if request_content_type != 'image/jpeg':
+            raise Exception(f'Requested unsupported ContentType in request content_type {request_content_type}')
+    print('input_fn: Deserializing input data')
+    ## Size of the image is predecided, comes sized from the client.
+    orig_img = Image.open(BytesIO(base64.b64decode(request_body))).convert("RGB")
+    print('input_fn: saving to a new image file')
+    orig_img.save('input_image.jpg')
+    print('input_fn: running alignment for the input image')
+    aligned_image = run_alignment('input_image.jpg')
+    print('input_fn: resizing the image to 256 x 256')
+    aligned_image.resize((256,256))
+    print('input_fn: applying transformation to the resized image')
+    final_input_image = trsfms(aligned_image)
+    print('input_fn: exiting input_fn')
+    return final_input_image
+
+#### Lets comment each of the custom implimentations - one at a time ####
 #def predict_fn(input_data, model):
 #    final_input_image = input_data
 #    print('Generating prediction based on input')
