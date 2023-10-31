@@ -51,14 +51,16 @@ def input_fn(request_body, request_content_type):
     '''WIP: Expecting image/jpeg content type'''
     if request_content_type != 'image/jpeg':
             raise Exception(f'Requested unsupported ContentType in request content_type {request_content_type}')
-    print('input_fn: Deserializing input data')
+    #print('input_fn: Deserializing input data')
     ###This commented code does not apply in the case of async inference
     ## Size of the image is predecided, comes sized from the client.
     #orig_img = Image.open(BytesIO(base64.b64decode(request_body))).convert("RGB")
     #print('input_fn: saving to a new image file')
     #orig_img.save('input_image.jpg')
+    img = Image.open(BytesIO(request_body))
+    img.save('./input_image.jpg')
     print('input_fn: running alignment for the input image')
-    aligned_image = run_alignment('input_image.jpg')
+    aligned_image = run_alignment('./input_image.jpg')
     print('input_fn: resizing the image to 256 x 256')
     aligned_image.resize((256,256))
     print('input_fn: applying transformation to the resized image')
