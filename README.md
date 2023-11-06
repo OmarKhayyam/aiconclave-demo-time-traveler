@@ -28,7 +28,7 @@ Next, run the following command, in the same order as given below:
 
 `tar czvf model.tar.gz ./* `
 
-`aws s3 cp model.tar.gz s3://<Amazon S3 bucketname>/model.tar.gz` (Your S3 bucket may be different, make changes here and to the Notebook below accordingly)
+`aws s3 cp model.tar.gz s3://<Amazon S3 bucketname>/model.tar.gz` **(Your S3 bucket may be different, make changes here and to the Notebook below accordingly)**
 
 `cd container`
 
