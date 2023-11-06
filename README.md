@@ -42,3 +42,4 @@ Upload the `inference-test-NB-Working.ipynb` notebook to the Notebook instance, 
 
 Run the first 10 cells of this Notebook, one after another, you will have to upload a photograph of yourself or a sample photograph to use as input, to the S3 input location when you call `invoke_endpoint_async`.
 
+__DO NOT__ run the update endpoint cell, instead, skip to the delete enpoint cell to clean up your infrastructure.
