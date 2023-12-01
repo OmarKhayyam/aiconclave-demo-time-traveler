@@ -222,7 +222,7 @@ showSpecificImage(2,results)
 
 All of the above code and a lot of experiments are present in the Jupyter Notebook available in this repository **inference-test-NB-Working.ipynb**.
 
-![alt text](./images/Time_Traveler_Demo_Flow.jpg "The flow of data and events during an inference request.")
+![alt text](./images/Time_Traveler_Flow_Diagram.jpg "The flow of data and events during an inference request.")
 
 #### How the demo works
 
