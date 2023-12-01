@@ -222,6 +222,33 @@ showSpecificImage(2,results)
 
 All of the above code and a lot of experiments are present in the Jupyter Notebook available in this repository **inference-test-NB-Working.ipynb**.
 
+![alt text](./images/Time_Traveler_Demo_Flow.jpg "The flow of data and events during an inference request.")
+
+#### How the demo works
+
+Please refer to the diagram above and the explanation for the corresponding numbered steps below:
+
+1. A client makes a __PUT__ request to an REST API endpoint to upload an image file to the S3 input bucket.
+
+2. This generates an __event__.
+
+3. The __event__ is delivered to Lambda, which results in an invocation of the image processor lambda function.
+
+4. The image processor updates a Job tracker table in DynamoDB. This update indicates that the image is being processed.
+
+5. The input location from the __event__ is used to invoke the SageMaker model endpoint.
+
+6. The SageMaker model processes the inference request and uploads the results to a destination bucket.
+
+7. Once the results are uploaded to the destination bucket, the model endpoint sends a response back to the image processor Lambda function.
+
+8. The Lambfa function downloads the results from the destination bucket and further runs a split on the results. After the split, it uploads the results of the split process back to the destination S3 location.
+
+9. Image processor lambda function updates the specific item with the completion status of the request.
+
+10. The client, after having __PUT__ the input image on S3 for processing, retries by sending __GET__ to the Jobtracker lambda function through an HTTP API endpoint. The Job tracker checks for completion of the image processing and sends the current status at every request. This step completes when the API returns a __SUCCESS__ status.
+
+11. The client makes a __GET__ request to another REST API endpoint to get the processed image results.
 
 **WIP**
 
