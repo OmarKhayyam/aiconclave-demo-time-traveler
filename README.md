@@ -18,23 +18,50 @@ In the directory where you have cloned this repository:
 You should see two directories: `code` and `container`.
 
 
-Next, download the PyTorch model file from this [Google drive location](https://drive.google.com/file/d/1ZILUGnwMyhrSYXaWnpFwzASVFt7ZXSSb/view?usp=drive_link). This has been specifically kept at this location for this purpose. We are not training/fine-tuning this model. If you want to know more about this model you can find it in this paper [here](https://arxiv.org/pdf/2102.02754.pdf), additionally, we use Dlib for facial landmark detection, this article provides a good [intro to Dlib](https://towardsdatascience.com/facial-mapping-landmarks-with-dlib-python-160abcf7d672).
+Next, download the PyTorch model file from this [Google drive location](https://drive.google.com/file/d/1ZILUGnwMyhrSYXaWnpFwzASVFt7ZXSSb/view?usp=drive_link) to the current working directory. 
 
 
-Place the above downloaded file at the same level as the directories `code` and `container`, so your ls should show `model.pt`, apart from `code` and `container` directories. __Note__: If you have a `model.tar.gz` from previous runs of these commands, make sure you have deleted it using the following command: `rm model.tar.gz`.
+The name of the file is `model.pt`. You can use [gdown](https://pypi.org/project/gdown/) to directly download the file, [these instructions](https://stackoverflow.com/questions/25010369/wget-curl-large-file-from-google-drive) might be useful. 
+
+
+We are not training/fine-tuning this model. If you want to know more about this model you can find it in this paper [here](https://arxiv.org/pdf/2102.02754.pdf), additionally, we will be using Dlib for facial landmark detection, this article provides a good [intro to Dlib](https://towardsdatascience.com/facial-mapping-landmarks-with-dlib-python-160abcf7d672).
+
+
+Place the above downloaded file at the same level as the directories `code`, `lambda_container`, `README.md` and `container` in the cloned repository, so your ls should show `model.pt`, apart from the previously mentioned directories. __Note__: If you have a `model.tar.gz` from previous runs of these commands, make sure you have deleted it using the following command: `rm model.tar.gz`.
 
 
 Next, run the following command, in the same order as given below:
 
-`tar czvf model.tar.gz ./* `
+`tar czvf model.tar.gz ./code model.pt`
 
-`aws s3 cp model.tar.gz s3://<Amazon S3 bucketname>/model.tar.gz` **(Your S3 bucket may be different, make changes here and to the Notebook below accordingly)**
+This will create the structure [described in this documentation](https://sagemaker.readthedocs.io/en/v2.32.1/frameworks/pytorch/using_pytorch.html#model-directory-structure). Looks like the below picture.
+
+![alt text](./images/Pytorch_SageMaker_Inference_Directory_Structure.jpg "Inference bundle for PyTorch on Amazon SageMaker")
+
+
+Once you have created the model artifacts i.e. model.tar.gz, upload it to your preferred Amazon S3 location. You can add additional prefixes if you like.
+
+
+`aws s3 cp model.tar.gz s3://<Amazon S3 bucketname>/model.tar.gz` **(Your S3 bucket and key name may differ, but has to always end with `model.tar.gz`)**
+
+
+Now, change directory as shown below.
+
 
 `cd container`
 
+
+Execute the following command.
+
+
 `./build_and_push.sh`
 
-Make a note of the ECR image URL from the previous command.
+
+The previous command will create the ECR repo, and push the image to it for SageMaker to use later. Make a note of the ECR image URL from the previous command, you will need it later.
+
+Now that we have our model artifacts and the container image ready. Let us deploy the model.
+
+**WIP**
 
 Next, launch a Amazon SageMaker Notebook instance. __NOTE__, we want to launch a Notebook instance, not the Studio UI.
 
