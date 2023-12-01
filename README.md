@@ -70,27 +70,29 @@ Now that we have our model artifacts and the container image ready. Let us deplo
 
 You should do this from a Jupyter Notebook. The following code in the notebook will ensure you deploy the model for this demo.
 
-`
+```
 import boto3
 
-aws_region='ap-south-1'
+aws_region="ap-south-1"
 
 role = get_execution_role()
 
-sagemaker_client = boto3.client('sagemaker', region_name=aws_region)
+sagemaker_client = boto3.client("sagemaker", region_name=aws_region)
 
 sagemaker_role= get_execution_role()
-`
+```
 
 Set up the bucket and object key for the model artifacts.
 
-` #Create a variable w/ the model S3 URI
+```
+#Create a variable w/ the model S3 URI
 s3_bucket = 'my_demo_bucket' # Provide the name of your S3 bucket
 bucket_prefix=''
 model_s3_key = f"model.tar.gz"
 
 #Specify S3 bucket w/ model
-model_url = f"s3://{s3_bucket}/{model_s3_key}"`
+model_url = f"s3://{s3_bucket}/{model_s3_key}"
+```
 
 You created your inference container a few steps back, set that up.
 
@@ -98,7 +100,8 @@ You created your inference container a few steps back, set that up.
 
 We will be going for an asynchronous endpoint, because we aren't sure how long our model might take.
 
-`model_name = 'model-name'
+```
+model_name = 'model-name'
 
 #Create model
 create_model_response = sagemaker_client.create_model(
@@ -112,11 +115,13 @@ create_model_response = sagemaker_client.create_model(
             'TS_MAX_RESPONSE_SIZE': '100000000',
             'TS_DEFAULT_RESPONSE_TIMEOUT': '1000'
         },
-    })`
+    })
+```
 
 Create an endpoint configuration. I have removed all the optional parts from the code below.
 
-`s3_bucket_new = 'my-demo-bucket-output' ## output bucket
+```
+s3_bucket_new = 'my-demo-bucket-output' ## output bucket
 endpoint_name = 'my-demo-endpoint'
 endpoint_config_name = "my-demo-config-name"
 
@@ -143,19 +148,22 @@ create_endpoint_config_response = sagemaker_client.create_endpoint_config(
         }
     }
 )
-`
+```
 
 Create your endpoint.
 
-`create_endpoint_response = sagemaker_client.create_endpoint(
+```
+create_endpoint_response = sagemaker_client.create_endpoint(
                                             EndpointName=endpoint_name, 
-                                            EndpointConfigName=endpoint_config_name) `
+                                            EndpointConfigName=endpoint_config_name)
+```
 
 The endpoint creation might take some time, but it will eventually get done. Your model is now ready for inference requests.
 
 Invoke the model using this code,
 
-`# Create a low-level client representing Amazon SageMaker Runtime
+```
+# Create a low-level client representing Amazon SageMaker Runtime
 sagemaker_runtime = boto3.client("sagemaker-runtime", region_name="ap-south-1")
 
 # Specify the location of the input. Here, a single JPEG file. Note that SageMaker should have access to the S3 location.
@@ -171,27 +179,29 @@ response = sagemaker_runtime.invoke_endpoint_async(
                             Accept='application/x-npy',
                             InputLocation=input_location,
                             InvocationTimeoutSeconds=900)`
+```
 
+You will find the model output serialized at the location which you can find in the `response` to the `invoke_endpoint_async` call. You can find it in `response["OutputLocation"]`. You can isolate the S3 bucket (which you already have) and the key to download the inference results using the code below, replace with your own specific values.
 
-You will find the model output serialized at the location which you can find in the `response` to the `invoke_endpoint_async` call. You can find it in response["OutputLocation"]. You can isolate the S3 bucket (which you already have) and the key to download the inference results using the code below, replace with your own specific values.
-
-`import botocore.exceptions
+```
+import botocore.exceptions
 
 s3 = boto3.client('s3')
 try:
     resp = s3.download_file(s3_bucket_new,'somefolder_prefix/some_object_key','local_filename')
 except Exception as e:
     pprint(e)`
-
+```
 
 To test the model's inference capability, try the code below. This function displayes the specific image you want as the output of the cell where you call it. In the current setup and based on the current inference code, we get 5 images back, the first is the original image, and the rest from subscript 1 to 4 are part of the inference process.
 
-`from PIL import Image
+```
+from PIL import Image
 import numpy as np
 
-results = np.load(f"local_filename")`
+results = np.load(f"local_filename")
 
-`def showSpecificImage(image_number,images_array):
+def showSpecificImage(image_number,images_array):
     '''image_numbers start from 0, 
     where image_number == 0 is the original, 
     photographed image'''
@@ -205,9 +215,10 @@ results = np.load(f"local_filename")`
         starting_point = image_number*1024
         end_point = starting_point+1024
     img = Image.fromarray(images_array[:,starting_point:end_point,:])
-    img.show()`
+    img.show()
 
 showSpecificImage(2,results)
+```
 
 All of the above code and a lot of experiments are present in the Jupyter Notebook available in this repository **inference-test-NB-Working.ipynb**.
 
