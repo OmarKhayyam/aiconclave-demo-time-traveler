@@ -15,7 +15,7 @@ In the directory where you have cloned this repository:
 `ls`
 
 
-You should see two directories: `code` and `container`.
+You should see 3 directories: `code`, `lambda_container`, `images` and `container`.
 
 
 Next, download the PyTorch model file from this [Google drive location](https://drive.google.com/file/d/1ZILUGnwMyhrSYXaWnpFwzASVFt7ZXSSb/view?usp=drive_link) to the current working directory. 
@@ -42,7 +42,9 @@ This will create the structure [described in this documentation](https://sagemak
 Once you have created the model artifacts i.e. model.tar.gz, upload it to your preferred Amazon S3 location. You can add additional prefixes if you like.
 
 
-`aws s3 cp model.tar.gz s3://<Amazon S3 bucketname>/model.tar.gz` **(Your S3 bucket and key name may differ, but has to always end with `model.tar.gz`)**
+`aws s3 cp model.tar.gz s3://<Amazon S3 bucketname>/model.tar.gz` 
+
+**NB: Your S3 bucket and key name may differ, but has to always end with `model.tar.gz`**
 
 
 Now, change directory as shown below.
@@ -59,25 +61,26 @@ Execute the following command. You can change the name of the repository by maki
 
 The previous command will create the ECR repo, and push the image to it for SageMaker to use later. Make a note of the ECR image URL from the previous command, you will need it later.
 
+
 Now that we have our model artifacts and the container image ready. Let us deploy the model to a SageMaker endpoint.
 
 
 #### Model deployment
 
+
 You should do this from a Jupyter Notebook. The following code in the notebook will ensure you deploy the model for this demo.
 
-`import boto3
+`
+import boto3
 
-# Specify your AWS Region
 aws_region='ap-south-1'
 
 role = get_execution_role()
 
-# Create a low-level SageMaker service client.
 sagemaker_client = boto3.client('sagemaker', region_name=aws_region)
 
-# Role to give SageMaker permission to access AWS services.
-sagemaker_role= get_execution_role()`
+sagemaker_role= get_execution_role()
+`
 
 Set up the bucket and object key for the model artifacts.
 
