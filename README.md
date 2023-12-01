@@ -59,7 +59,7 @@ Execute the following command.
 
 The previous command will create the ECR repo, and push the image to it for SageMaker to use later. Make a note of the ECR image URL from the previous command, you will need it later.
 
-Now that we have our model artifacts and the container image ready. Let us deploy the model.
+Now that we have our model artifacts and the container image ready. Let us deploy the model to a SageMaker endpoint.
 
 **WIP**
 
