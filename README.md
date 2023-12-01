@@ -9,7 +9,7 @@ Make sure that you have cloned this repository. You can do this using intriction
 ## Add your files
 
 Once you have cloned this repository. Please follow the below steps to set this demo up in your AWS account.
-in the directory where you have cloned this repository:
+In the directory where you have cloned this repository:
 
 
 `ls`
@@ -18,7 +18,7 @@ in the directory where you have cloned this repository:
 You should see two directories: `code` and `container`.
 
 
-Next, download the PyTorch model file from this [Google drive location](https://drive.google.com/file/d/1ZILUGnwMyhrSYXaWnpFwzASVFt7ZXSSb/view?usp=drive_link)
+Next, download the PyTorch model file from this [Google drive location](https://drive.google.com/file/d/1ZILUGnwMyhrSYXaWnpFwzASVFt7ZXSSb/view?usp=drive_link). This has been specifically kept at this location for this purpose. We are not training/fine-tuning this model. If you want to know more about this model you can find it in this paper [here](https://arxiv.org/pdf/2102.02754.pdf), additionally, we use Dlib for facial landmark detection, this article provides a good [intro to Dlib](https://towardsdatascience.com/facial-mapping-landmarks-with-dlib-python-160abcf7d672).
 
 
 Place the above downloaded file at the same level as the directories `code` and `container`, so your ls should show `model.pt`, apart from `code` and `container`. __Note__: If you have a `model.tar.gz` from previous runs of these commands, make sure you have deleted it using the following command: `rm model.tar.gz`.
