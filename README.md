@@ -242,7 +242,7 @@ Please refer to the diagram above and the explanation for the corresponding numb
 
 7. Once the results are uploaded to the destination bucket, the model endpoint sends a response back to the image processor Lambda function.
 
-8. The Lambfa function downloads the results from the destination bucket and further runs a split on the results. After the split, it uploads the results of the split process back to the destination S3 location.
+8. The Lambda function downloads the results from the destination bucket and further runs a split on the results. After the split, it uploads the results of the split process back to the destination S3 location.
 
 9. Image processor lambda function updates the specific item with the completion status of the request.
 
@@ -252,8 +252,121 @@ Please refer to the diagram above and the explanation for the corresponding numb
 
 ## Demo component details, configuration and code
 
-This section details the configurations of every ccomponent that we use in this demo.
+This section details the configurations of every component that we use in this demo.
 
+### Proxy API for uploading input files to S3
+
+The REST API for uploading files to Amazon S3 is set up as a proxy to the S3 input location. The entire URL to the input image object is passed in to the `invoke_endpoint_async()` call. You can get more information about setting up such proxy REST API endpoints [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-s3.html).
+
+### Image processing lambda function
+
+The lambda function is triggered by the S3 FileUpload event. The function prepares for the call to the SageMaker endpoint. On receiving the results of the inference. The function downloads the results, splits the result into individual images and uploads it to the destination S3 location. During the processing it also updates a DynamoDB table that is used to keep track of the status of the image processing jobs.
+
+Due to the fact that there are many dependencies, we use an image to deploy the lambda, and the `lambda_container` directory in this repo is all you need to deploy it. You can find in-depth information about Lambda container deployments [here](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html).
+
+### Job tracking 
+
+This has three components, an HTTP API endpoint, an AWS Lambda function and a DynamoDB table.
+
+#### The HTTP endpoint
+
+This is simply an HTTP API endpoint that has a lambda integration. You can learn more about setting such an endpoint up [here](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-lambda.html).
+
+#### The lambda function
+
+This function is triggered by a call to the HTTP API endpoint. It uses a request id key to check if a specific image processing job is complete. If it is, it returns __SUCCESS__ with an __HTTP 200 OK__ code. Along with this, it also sends back metadata about the resulting image files. the metadata is of the from, this is only a sample:
+
+```
+{
+    'statusCode': 200, 
+    'body': {
+        'Metadata': '{
+            "Results": [
+                {
+                    "Filename": "SomeName_0.jpg", 
+                    "AgeRange": "ORIGINAL"
+                }, 
+                {
+                    "Filename": "SomeName_1.jpg", 
+                    "AgeRange": "5-10"
+                }, 
+                {
+                    "Filename": "SomeName_2.jpg", 
+                    "AgeRange": "10-18"
+                }, 
+                {
+                    "Filename": "SomeName_3.jpg", 
+                    "AgeRange": "45-55"
+                }, 
+                {
+                    "Filename": "SomeName_4.jpg", 
+                    "AgeRange": "90-100"
+                }
+            ]
+        }', 
+        'Status': 'SUCCESS'
+    }
+}
+```
+
+On the other hand, if the image hasn't been processed, the function returns an HTTP status code of __200 OK__ and a __Status__ value of __INPROGRESS__.
+
+For the purposes of this demo the Lambda function was written directly in the management console. For the record, providing the code listing for the function below.
+
+```
+import json
+import boto3
+
+DYNAMODBTABLE='AgeProcessingJob'
+
+def lambda_handler(event, context):
+    ### Get the RequestId from the event
+    reqid = event['queryStringParameters']['RequestId']
+    dynamodb = boto3.client('dynamodb')
+    response = dynamodb.query(
+        ExpressionAttributeValues={
+            ':v1': {
+                'S': reqid,
+            },
+        },
+        KeyConditionExpression='RequestId = :v1',
+        ProjectionExpression='CompletionStatus',
+        TableName='AgeProcessingJob'
+    )
+    if response['Items'][0]['CompletionStatus']['N'] == '1':
+        imageData = {
+            "Results": [
+                {
+                    "Filename": reqid + "_0.jpg",
+                    "AgeRange": "ORIGINAL"
+                },
+                {
+                    "Filename": reqid + "_1.jpg",
+                    "AgeRange": "5-10"
+                },
+                {
+                    "Filename": reqid + "_2.jpg",
+                    "AgeRange": "10-18"
+                },
+                {
+                    "Filename": reqid + "_3.jpg",
+                    "AgeRange": "45-55"
+                },
+                {
+                    "Filename": reqid + "_4.jpg",
+                    "AgeRange": "90-100"
+                }
+            ]
+        }
+        responseDict = {"statusCode": 200, "body": {"Metadata": json.dumps(imageData), "Status": "SUCCESS"}}
+        return json.dumps(responseDict)
+    else:
+        return "{'statusCode': 200, 'body': {'Status': 'INPROGRESS'}}"
+```
+
+#### The DynamoDB table
+
+This is simple on-demand provisioned table and is simply used to store `requestid`'s and `CompletionStatus` of the image processing job. `0` (zero) represents an in-progress job and `1`(one) represents a completed job.
 
 **WIP**
 
