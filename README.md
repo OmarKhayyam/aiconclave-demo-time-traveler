@@ -2,11 +2,11 @@
 
 
 
-## Getting started
+### Getting started
 
 Make sure that you have cloned this repository. You can do this using intrictions from GitLab. Note that this code has been tested in __ap-south-1__ only.
 
-## Add your files
+### Add your files
 
 Once you have cloned this repository. Please follow the below steps to set this demo up in your AWS account.
 In the directory where you have cloned this repository:
@@ -65,7 +65,7 @@ The previous command will create the ECR repo, and push the image to it for Sage
 Now that we have our model artifacts and the container image ready. Let us deploy the model to a SageMaker endpoint.
 
 
-#### Model deployment
+### Model deployment
 
 
 You should do this from a Jupyter Notebook. The following code in the notebook will ensure you deploy the model for this demo.
@@ -224,7 +224,7 @@ All of the above code and a lot of experiments are present in the Jupyter Notebo
 
 ![alt text](./images/Time_Traveler_Flow_Diagram.jpg "The flow of data and events during an inference request.")
 
-#### How the demo works
+### How the demo works
 
 Please refer to the diagram above and the explanation for the corresponding numbered steps below:
 
@@ -249,6 +249,11 @@ Please refer to the diagram above and the explanation for the corresponding numb
 10. The client, after having __PUT__ the input image on S3 for processing, retries by sending __GET__ to the Jobtracker lambda function through an HTTP API endpoint. The Job tracker checks for completion of the image processing and sends the current status at every request. This step completes when the API returns a __SUCCESS__ status.
 
 11. The client makes a __GET__ request to another REST API endpoint to get the processed image results.
+
+## Demo component details, configuration and code
+
+This section details the configurations of every ccomponent that we use in this demo.
+
 
 **WIP**
 
