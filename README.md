@@ -98,7 +98,7 @@ You created your inference container a few steps back, set that up.
 
 `container = "111111111111.dkr.ecr.ap-south-1.amazonaws.com/my_repo:latest"`
 
-We will be going for an asynchronous endpoint, because we aren't sure how long our model might take.
+We will be going for an asynchronous endpoint, because we aren't sure how long our model might take. You can learn all about asynchronous inference in SageMaker [here](https://docs.aws.amazon.com/sagemaker/latest/dg/async-inference.html).
 
 ```
 model_name = 'model-name'
