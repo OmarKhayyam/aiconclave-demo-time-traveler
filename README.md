@@ -368,12 +368,7 @@ def lambda_handler(event, context):
 
 This is simple on-demand provisioned table and is simply used to store `requestid`'s and `CompletionStatus` of the image processing job. `0` (zero) represents an in-progress job and `1`(one) represents a completed job.
 
-**WIP**
+### Image retrieval
 
-Next, launch a Amazon SageMaker Notebook instance. __NOTE__, we want to launch a Notebook instance, not the Studio UI.
+Finally, images can be retrieved using a REST API endpoint with only the __GET__ method available. This proxy endpoint retrieves the file from the destination S3 location that the image processing lambda function (mentioned above) uploads them to.
 
-Upload the `inference-test-NB-Working.ipynb` notebook to the Notebook instance, use the `conda_pytorch_p310` kernel for this notebook.
-
-Run the first 10 cells of this Notebook, one after another, you will have to upload a photograph of yourself or a sample photograph to use as input, to the S3 input location when you call `invoke_endpoint_async`.
-
-__DO NOT__ run the update endpoint cell, instead, skip to the delete enpoint cell to clean up your infrastructure.
