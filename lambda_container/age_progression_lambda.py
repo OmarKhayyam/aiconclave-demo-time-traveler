@@ -52,7 +52,7 @@ def doesItExist(s3_url):
 	s3cl = boto3.client('s3')
 	resul = s3cl.list_objects_v2(Bucket=bkt,Prefix=ky,MaxKeys=1)
 	print(resul)
-	if resul['ResponseMetadata']['IsTruncated'] == False and resul['ResponseMetadata']['KeyCount'] == 1:
+	if resul['IsTruncated'] == False and resul['KeyCount'] == 1:
 		return True
 	else:
 		return False
