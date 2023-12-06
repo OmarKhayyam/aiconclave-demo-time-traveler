@@ -278,33 +278,32 @@ This function is triggered by a call to the HTTP API endpoint. It uses a request
 
 ```
 {
-    'statusCode': 200, 
-    'body': {
-        'Metadata': '{
+    "body": {
+        "Metadata": {
             "Results": [
                 {
-                    "Filename": "SomeName_0.jpg", 
+                    "Filename": "be19bce4-5703-4e4a-9add-99853dbca2c5_0.jpg",
                     "AgeRange": "ORIGINAL"
-                }, 
+                },
                 {
-                    "Filename": "SomeName_1.jpg", 
+                    "Filename": "be19bce4-5703-4e4a-9add-99853dbca2c5_1.jpg",
                     "AgeRange": "5-10"
-                }, 
+                },
                 {
-                    "Filename": "SomeName_2.jpg", 
+                    "Filename": "be19bce4-5703-4e4a-9add-99853dbca2c5_2.jpg",
                     "AgeRange": "10-18"
-                }, 
+                },
                 {
-                    "Filename": "SomeName_3.jpg", 
+                    "Filename": "be19bce4-5703-4e4a-9add-99853dbca2c5_3.jpg",
                     "AgeRange": "45-55"
-                }, 
+                },
                 {
-                    "Filename": "SomeName_4.jpg", 
+                    "Filename": "be19bce4-5703-4e4a-9add-99853dbca2c5_4.jpg",
                     "AgeRange": "90-100"
                 }
             ]
-        }', 
-        'Status': 'SUCCESS'
+        },
+        "Status": "SUCCESS"
     }
 }
 ```
@@ -334,34 +333,49 @@ def lambda_handler(event, context):
         TableName='AgeProcessingJob'
     )
     if response['Items'][0]['CompletionStatus']['N'] == '1':
-        imageData = {
-            "Results": [
-                {
-                    "Filename": reqid + "_0.jpg",
-                    "AgeRange": "ORIGINAL"
+        responseDict = { 
+            "body": {
+                "Metadata": {
+                    "Results": [
+                        {
+                            "Filename": reqid + "_0.jpg",
+                            "AgeRange": "ORIGINAL"
+                        },
+                        {
+                            "Filename": reqid + "_1.jpg",
+                            "AgeRange": "5-10"
+                        },
+                        {
+                            "Filename": reqid + "_2.jpg",
+                            "AgeRange": "10-18"
+                        },
+                        {
+                            "Filename": reqid + "_3.jpg",
+                            "AgeRange": "45-55"
+                        },
+                        {
+                            "Filename": reqid + "_4.jpg",
+                            "AgeRange": "90-100"
+                        }
+                    ]
                 },
-                {
-                    "Filename": reqid + "_1.jpg",
-                    "AgeRange": "5-10"
-                },
-                {
-                    "Filename": reqid + "_2.jpg",
-                    "AgeRange": "10-18"
-                },
-                {
-                    "Filename": reqid + "_3.jpg",
-                    "AgeRange": "45-55"
-                },
-                {
-                    "Filename": reqid + "_4.jpg",
-                    "AgeRange": "90-100"
-                }
-            ]
+                "Status": "SUCCESS"
+            }
         }
-        responseDict = {"statusCode": 200, "body": {"Metadata": json.dumps(imageData), "Status": "SUCCESS"}}
-        return json.dumps(responseDict)
+    elif response['Items'][0]['CompletionStatus']['N'] == -1:
+        responseDict = { 
+            "body": {
+                "Status": "FAILURE"
+            }
+        }
     else:
-        return "{'statusCode': 200, 'body': {'Status': 'INPROGRESS'}}"
+        responseDict = { 
+            "body": {
+                "Status": "INPROGRESS"
+            }
+        }
+        
+    return json.dumps(responseDict)
 ```
 
 #### The DynamoDB table
