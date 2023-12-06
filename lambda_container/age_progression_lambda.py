@@ -46,6 +46,13 @@ def getPreSignedURLs(s3_url_list):
 		ps_list.append(response)	
 	return ps_list
 
+def doesItExist(s3_url):
+	bkt = s3_url.split('/')[2]
+	ky = '/'.join(s3_url.split('/')[3:])
+	s3cl = boto3.client('s3')
+	resul = s3cl.list_objects_v2(Bucket=bkt,Prefix=ky,MaxKeys=1)
+	return not resul['IsTruncated']
+
 def getSpecificImage(image_number,images_array):
     '''image_numbers start from 0, 
     where image_number == 0 is the original, 
@@ -95,13 +102,30 @@ def handler(event,context):
 						ContentType=CONTENT_TYPE,
 						Accept=ACCEPTED_OUTPUT_FORMAT,
 						InputLocation=s3location,
-						InvocationTimeoutSeconds=900)
+						InvocationTimeoutSeconds=300)
 	if model_response['ResponseMetadata']['HTTPStatusCode'] == 202:
 		logger.info("Received response from model.")
 		Output_S3Location= model_response['OutputLocation']
 		logger.info("Output file: {}".format(Output_S3Location))
         ### Let us wait for the output file, give the model some time
-		time.sleep(10)
+		wait_time=0
+		while not doesItExist(Output_S3Location):
+			time.sleep(10)
+			wait_time += 1
+			if wait_time == 6: # We wait 60 seconds for the job to finish
+				## The files will not be processed, corrupt file
+				age_processing_job_table.update_item(
+					Key={
+					'RequestId': inputfile_basename,
+					},
+					UpdateExpression='SET CompletionStatus = :val1',
+					ExpressionAttributeValues={
+						':val1': -1
+					}
+				)
+				print("The file could not be found at this location: {}".format(Output_S3Location))
+				exit(0)
+
 	### Read the output file from the S3 location
 	bucket = Output_S3Location.split('/')[2]
 	s3_res = boto3.resource('s3')
