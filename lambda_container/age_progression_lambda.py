@@ -51,8 +51,8 @@ def doesItExist(s3_url):
 	ky = '/'.join(s3_url.split('/')[3:])
 	s3cl = boto3.client('s3')
 	resul = s3cl.list_objects_v2(Bucket=bkt,Prefix=ky,MaxKeys=1)
-	res = json.loads(resul)
-	if res['IsTruncated'] == False and len(res['Contents']) == 1:
+	print(resul)
+	if resul['IsTruncated'] == False and len(resul['Contents']) == 1:
 		return True
 	else:
 		return False
