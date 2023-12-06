@@ -51,7 +51,10 @@ def doesItExist(s3_url):
 	ky = '/'.join(s3_url.split('/')[3:])
 	s3cl = boto3.client('s3')
 	resul = s3cl.list_objects_v2(Bucket=bkt,Prefix=ky,MaxKeys=1)
-	return not resul['IsTruncated']
+	if resul['IsTruncated'] == False and len(resul['Contents']) == 1:
+		return True
+	else:
+		return False
 
 def getSpecificImage(image_number,images_array):
     '''image_numbers start from 0, 
