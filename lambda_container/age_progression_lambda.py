@@ -114,7 +114,6 @@ def handler(event,context):
 		wait_time=0
 		while not doesItExist(Output_S3Location):
 			time.sleep(10)
-			wait_time += 1
 			if wait_time == 6: # We wait 60 seconds for the job to finish
 				## The files will not be processed, corrupt file
 				age_processing_job_table.update_item(
@@ -128,6 +127,7 @@ def handler(event,context):
 				)
 				print("The file could not be found at this location: {}".format(Output_S3Location))
 				exit(0)
+			wait_time += 1
 
 	### Read the output file from the S3 location
 	bucket = Output_S3Location.split('/')[2]
