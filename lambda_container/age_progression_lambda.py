@@ -19,7 +19,7 @@ logger.addHandler(stream_handler)
 REGION='ap-south-1'
 BASEBUCKET='s3://rns-conclave-2023'
 OUTPUTBASEBUCKET='s3://rns-conclave-2023-output'
-ENDPOINT_NAME='time-traveler-endpoint-9'
+ENDPOINT_NAME='time-traveler-endpoint-10'
 CONTENT_TYPE='image/jpeg'
 ACCEPTED_OUTPUT_FORMAT='application/x-npy'
 NUM_IMAGES=5 ## This also includes the original input image
