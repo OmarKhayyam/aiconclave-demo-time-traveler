@@ -76,7 +76,9 @@ def predict_fn(input_data, model):
     #final_input_image = input_data
     print('predict_fn: Generating prediction based on input')
     # we'll run the image on multiple target ages 
-    target_ages = [0, 10, 50, 90]
+    # target_ages = [0, 10, 50, 90]
+    ## Setting up new target ages
+    target_ages = [25, 35, 55, 75]
     age_transformers = [AgeTransformer(target_age=age) for age in target_ages]
     print('predict_fn: Created age transformers')
     # Next we change the image to tensor 

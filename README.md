@@ -343,19 +343,19 @@ def lambda_handler(event, context):
                         },
                         {
                             "Filename": reqid + "_1.jpg",
-                            "AgeRange": "5-10"
+                            "AgeRange": "20-30"
                         },
                         {
                             "Filename": reqid + "_2.jpg",
-                            "AgeRange": "10-18"
+                            "AgeRange": "30-40"
                         },
                         {
                             "Filename": reqid + "_3.jpg",
-                            "AgeRange": "45-55"
+                            "AgeRange": "50-60"
                         },
                         {
                             "Filename": reqid + "_4.jpg",
-                            "AgeRange": "90-100"
+                            "AgeRange": "70-80"
                         }
                     ]
                 },
